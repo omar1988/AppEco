@@ -18,9 +18,12 @@ public class App {//the app agent
 	List<Position> unwanted;
 	List<Position> featurePositions;
 	List<Position> emptyPositions;
+	private int price = 0;
 	
 	//general values
 	public static final int Pfeat = 4;
+	public static final int WantedFeatPrice = 10;
+	public static final int UnwantedFeatPrice = -5;
 	
 	public App(Developer developer, int creationDay){
 		this.features = new boolean[10][10];
@@ -44,6 +47,7 @@ public class App {//the app agent
 				else this.features[i][j] = false;
 			}
 		}
+		
 		unwanted = new ArrayList<Position>();
 		for(int i = 0; i < 5 ; i++){
 			for(int j = 5; j < 10 ; j++){
@@ -56,6 +60,9 @@ public class App {//the app agent
 				if(this.features[i][j]) featurePositions.add(new Position(i, j));
 			}
 		}
+		
+		price = Math.max(5, (featurePositions.size()-unwanted.size()) * WantedFeatPrice + unwanted.size() * UnwantedFeatPrice);
+		
 		emptyPositions = new ArrayList<Position>();
 		for(int i = 0; i < 10 ; i++){
 			for(int j = 0; j < 10 ; j++){
@@ -163,6 +170,9 @@ public class App {//the app agent
 				if(this.features[i][j]) featurePositions.add(new Position(i, j));
 			}
 		}
+		
+		price = Math.max(5, (featurePositions.size()-unwanted.size()) * WantedFeatPrice + unwanted.size() * UnwantedFeatPrice);
+		
 		emptyPositions = new ArrayList<Position>();
 		for(int i = 0; i < 10 ; i++){
 			for(int j = 0; j < 10 ; j++){
@@ -197,5 +207,13 @@ public class App {//the app agent
 	 */
 	public int getCreationDate() {
 		return this.createdAt;
+	}
+	
+	public int getPrice(){
+		return this.price;
+	}
+	
+	public void setPrice(int price){
+		this.price=price;
 	}
 }

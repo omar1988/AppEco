@@ -19,6 +19,8 @@ public class Developer{//the developer agent
 	private int devDuration;
 	private int daysTaken;
 	
+	
+	public final static boolean cheaperCopy = true;
 	public final static int DEVmin = 1;//time min a developer can build an app
 	public final static int DEVmax = 180;//time max a developer can build an app
 	
@@ -147,11 +149,16 @@ public class Developer{//the developer agent
 		boolean[][] features;
 		if(Environment.r.nextInt(10) <= 4){//goes through a mutation
 			features = app.getFeaturesWithMutation();
+			copy.setFeatures(features);
 		}
 		else{//simply copies its features
 			features = app.getFeatures();
+			copy.setFeatures(features);
+			if(cheaperCopy){
+				copy.setPrice((int)(0.8*app.getPrice()));
+			}
 		}
-		copy.setFeatures(features);
+
 		return copy;
 	}
 	

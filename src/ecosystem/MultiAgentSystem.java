@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import util.Strategy;
+import ecosystem.agent.App;
 import ecosystem.agent.Developer;
 import ecosystem.agent.User;
 import ecosystem.environment.Environment;
@@ -17,6 +18,9 @@ public class MultiAgentSystem {
 
 	File userFile;
 	FileWriter userFileWriter;
+	
+	File priceFile;
+	FileWriter priceFileWriter;
 
 	
 	private int currentDay;//useless ?
@@ -27,31 +31,49 @@ public class MultiAgentSystem {
 
 		userFile = new File("./user.csv");
 		userFileWriter = new FileWriter(userFile);
+		
+		priceFile = new File("./price.csv");
+		priceFileWriter = new FileWriter(priceFile);
+
 	}
 	
 	private void runOnce(int day) throws IOException{
 		i++;
-
+		long debut=System.currentTimeMillis();
+		
+		
 		List<Developer> developers = Environment.getInstance().getDevelopers();
 		List<User> users = Environment.getInstance().getUsers();
 		
-		long debut=System.currentTimeMillis();
+
 		for(Developer developer : developers) developer.buildingApp(day);
-		System.out.println("day "+i+" / 1 : "+(System.currentTimeMillis()-debut));
-		debut=System.currentTimeMillis();
-		
 		for(User user : users) user.browse(day);
-		System.out.println("day "+i+" / 2 : "+(System.currentTimeMillis()-debut));
+		
 		Environment.getInstance().increaseAgentPopulation(day);
 		
-		System.out.println("devs : "+developers.size());
-		System.out.println("utilisateurs : "+users.size());
+		System.out.println("day "+i+" / "+(System.currentTimeMillis()-debut)+" ms");
+		
+		double prixTotal = 0;
+		double nbApp = 0;
+		
+		for(Developer dev : Environment.getInstance().getDevelopers()){
+			nbApp+=dev.getAppsNumber();
+			for(App app : dev.getUploadedApp()){
+				prixTotal+=app.getPrice();
+			}
+		}
+		
+		priceFileWriter.write(i+","+prixTotal/nbApp+"\n");
 		
 		userFileWriter.write(i+","+developers.size()+","+users.size()+"\n");
 		
-		for(Strategy s : Strategy.values()){
-			System.out.println(s+" download /apps : "+Environment.getInstance().getAverageDownloadsPerApp(s));
+		
+		if(i%25==0){
+			priceFileWriter.flush();
+			userFileWriter.flush();
 		}
+		
+
 	}
 	
 	public void run() throws IOException{
@@ -61,6 +83,7 @@ public class MultiAgentSystem {
 			this.currentDay++;
 		}
 		userFileWriter.close();
+		priceFileWriter.close();
 	}
 
 	/**
