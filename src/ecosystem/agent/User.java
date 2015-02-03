@@ -2,9 +2,9 @@ package ecosystem.agent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import util.Position;
+import ecosystem.environment.Environment;
 import ecosystem.environment.Store;
 
 public class User{//the user agent
@@ -22,7 +22,7 @@ public class User{//the user agent
 	public final static int KEYmin = 0;
 	public final static int KEYmax = 50;
 	
-	public final static float Ppref = 0.45f;
+	public final static int Ppref = 45; // sur 100
 	
 	public User() {
 		this.preferences = new boolean[10][10];
@@ -37,17 +37,16 @@ public class User{//the user agent
 	 */
 	private void initPreferences(){
 		//TODO to check
-		Random random = new Random();
 		//2 separate 'for' loops blocks in order to let the top right 5*5 grid empty, as suggested by the article
 		for(int i = 0; i < 5; i++){
 			for(int j = 0; j < 5; j++){
-				if (random.nextFloat() <= User.Ppref) this.preferences[i][j] = true;
+				if (Environment.r.nextInt(100) <= User.Ppref) this.preferences[i][j] = true;
 				else this.preferences[i][j] = false;
 			}
 		}
 		for(int i = 5 ; i < 10 ; i++){
 			for(int j = 0; j < 10 ; j++){
-				if (random.nextFloat() <= User.Ppref) this.preferences[i][j] = true;
+				if (Environment.r.nextInt(100) <= User.Ppref) this.preferences[i][j] = true;
 				else this.preferences[i][j] = false;
 			}
 		}
@@ -85,9 +84,8 @@ public class User{//the user agent
 	 * Inits daysBtwBrowse and daysElapsed
 	 */
 	private void initBrowseValues(){
-		Random r = new Random();
-		this.daysBtwBrowse = User.BROmin + r.nextInt(User.BROmax - User.BROmin + 1);
-		this.daysElapsed = r.nextInt(this.daysBtwBrowse + 1);
+		this.daysBtwBrowse = User.BROmin + Environment.r.nextInt(User.BROmax - User.BROmin + 1);
+		this.daysElapsed = Environment.r.nextInt(this.daysBtwBrowse + 1);
 	}
 	
 	/**
@@ -95,8 +93,7 @@ public class User{//the user agent
 	 * @return
 	 */
 	private int getKeywordSearchNumber(){
-		Random r = new Random();
-		return (User.KEYmin + r.nextInt(User.KEYmax - User.KEYmin + 1));
+		return (User.KEYmin + Environment.r.nextInt(User.KEYmax - User.KEYmin + 1));
 	}
 	
 	public void browse(int day){
@@ -104,26 +101,26 @@ public class User{//the user agent
 		if(this.daysElapsed >= this.daysBtwBrowse){
 			this.daysElapsed = 0;
 			//select apps to download:
-			App[] topApp = Store.getInstance().getTopAppsChart();
-			App[] newApp = Store.getInstance().getNewAppsChart();
-			App[] searchApp = Store.getInstance().getKeywordSearch(this.getKeywordSearchNumber());
+			List<App> topApp = Store.getInstance().getTopAppsChart();
+			List<App> newApp = Store.getInstance().getNewAppsChart();
+			List<App> searchApp = Store.getInstance().getKeywordSearch(this.getKeywordSearchNumber());
 			//browses the Top App Chart
-			for(int i = 0; i < topApp.length; i++){
-				App app = topApp[i];
+			for(int i = 0; i < topApp.size(); i++){
+				App app = topApp.get(i);
 				if(this.likesApp(app)){
 					this.downloadApp(app, day);
 				} 
 			}
 			//browses the New App Chart
-			for(int i = 0; i < newApp.length; i++){
-				App app = newApp[i];
+			for(int i = 0; i < newApp.size(); i++){
+				App app = newApp.get(i);
 				if(this.likesApp(app)){
 					this.downloadApp(app, day);
 				} 
 			}
 			//conducts a Keyword Search
-			for(int i = 0; i < searchApp.length; i++){
-				App app = searchApp[i];
+			for(int i = 0; i < searchApp.size(); i++){
+				App app = searchApp.get(i);
 				if(this.likesApp(app)){
 					this.downloadApp(app, day);
 				} 

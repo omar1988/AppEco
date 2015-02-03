@@ -1,10 +1,8 @@
 package ecosystem.environment;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import util.Strategy;
 import util.comparator.AppDownloadComparator;
@@ -39,12 +37,11 @@ public class Store {
 	 * Inits the store by creating apps
 	 */
 	private void initApps(){
-		Random r = new Random();
 		for(int i = 0; i < Store.initApp ; i++){
 			Developer dev;//selects a random dev from the environment
 			Strategy strat;
 			do{
-				dev = Environment.getInstance().getDevelopers().get(r.nextInt(Environment.getInstance().getDevelopers().size()));
+				dev = Environment.getInstance().getDevelopers().get(Environment.r.nextInt(Environment.getInstance().getDevelopers().size()));
 				strat = dev.getStrategy();
 			}while(strat == Strategy.COPYCAT || strat == Strategy.FLEXIBLE);
 			dev = new Developer(strat);
@@ -54,7 +51,7 @@ public class Store {
 		
 		for(int i = 0; i < Store.N_MaxNewChart ;i++){//inits the New Apps Chart
 			//TODO check if an app doesn't exist more than once
-			App newApp = this.apps.get(r.nextInt(this.apps.size()));
+			App newApp = this.apps.get(Environment.r.nextInt(this.apps.size()));
 			this.NewAppsChart.add(newApp);
 		}
 	}
@@ -92,20 +89,14 @@ public class Store {
 		Collections.shuffle(this.apps);
 	}
 	
-	public App[] getTopAppsChart(){//TODO check list size
+	public List<App> getTopAppsChart(){//TODO check list size
 		this.sortAppsByDownload();
-		App[] topApps = new App[Store.N_MaxTopChart];
-		for(int i = 0; i < Store.N_MaxTopChart ; i++){
-			topApps[i] = this.apps.get(this.apps.size() - i - 1);
-		}
-		return topApps;
+		return apps.subList(0, Store.N_MaxTopChart);
 	}
 	
-	public App[] getNewAppsChart(){
-		//convert to array
-		App[] newApps = new App[this.NewAppsChart.size()];
-		newApps = this.NewAppsChart.toArray(newApps);
-		return newApps;
+	public List<App> getNewAppsChart(){
+
+		return NewAppsChart;
 	}
 	
 	/**
@@ -113,11 +104,10 @@ public class Store {
 	 * @param search the number of app the user was looking for
 	 * @return a random number of app
 	 */
-	public App[] getKeywordSearch(int search){
-		App[] searchedApps = new App[search];
-		Random r = new Random();
+	public List<App> getKeywordSearch(int search){
+		List<App> searchedApps = new ArrayList<App>(search);
 		for(int i = 0; i < search ; i++){//TODO make sure it doesn't return an array containing more than 2 times the same app
-			searchedApps[i] = this.getApps().get(r.nextInt(this.getApps().size()));
+			searchedApps.add(this.getApps().get(Environment.r.nextInt(this.getApps().size())));
 		}
 		return searchedApps;
 	}

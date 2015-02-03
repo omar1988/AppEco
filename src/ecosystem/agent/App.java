@@ -2,7 +2,6 @@ package ecosystem.agent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import util.Position;
 import ecosystem.MultiAgentSystem;
@@ -16,9 +15,12 @@ public class App {//the app agent
 	private Developer createdBy;
 	private int createdAt;
 	private List<User> downloadedBy;
+	List<Position> unwanted;
+	List<Position> featurePositions;
+	List<Position> emptyPositions;
 	
 	//general values
-	public static final float Pfeat = 0.04f;
+	public static final int Pfeat = 4;
 	
 	public App(Developer developer, int creationDay){
 		this.features = new boolean[10][10];
@@ -36,45 +38,41 @@ public class App {//the app agent
 	 * any developer's first app is created randomly
 	 */
 	private void initFeatures(){//TODO
-		Random random = new Random();
 		for(int i = 0 ; i < 10 ; i++){
 			for(int j = 0; j < 10 ; j++){
-				if (random.nextFloat() <= App.Pfeat) this.features[i][j] = true;
+				if (Environment.r.nextInt(100) <= App.Pfeat) this.features[i][j] = true;
 				else this.features[i][j] = false;
 			}
 		}
-	}
-	
-	public List<Position> getUnwantedFeaturePositions(){
-		//TODO
-		List<Position> unwanted = new ArrayList<Position>();
+		unwanted = new ArrayList<Position>();
 		for(int i = 0; i < 5 ; i++){
 			for(int j = 5; j < 10 ; j++){
 				if(this.features[i][j]) unwanted.add(new Position(i, j));
 			}
 		}
-		return unwanted;
-	}
-	
-	public List<Position> getFeaturePositions(){
-		//TODO
-		List<Position> featurePositions = new ArrayList<Position>();
+		featurePositions = new ArrayList<Position>();
 		for(int i = 0; i < 10 ; i++){
 			for(int j = 0; j < 10 ; j++){
 				if(this.features[i][j]) featurePositions.add(new Position(i, j));
 			}
 		}
-		return featurePositions;
-	}
-	
-	public List<Position> getEmptyPositions(){
-		//TODO
-		List<Position> emptyPositions = new ArrayList<Position>();
+		emptyPositions = new ArrayList<Position>();
 		for(int i = 0; i < 10 ; i++){
 			for(int j = 0; j < 10 ; j++){
 				if(!this.features[i][j]) emptyPositions.add(new Position(i, j));
 			}
 		}
+	}
+	
+	public List<Position> getUnwantedFeaturePositions(){
+		return unwanted;
+	}
+	
+	public List<Position> getFeaturePositions(){
+		return featurePositions;
+	}
+	
+	public List<Position> getEmptyPositions(){
 		return emptyPositions;
 	}
 	
@@ -137,11 +135,10 @@ public class App {//the app agent
 		int featuresNumber = this.getFeaturesNumber();
 		//there is no move if the grid is either completely empty or full of features
 		if(featuresNumber > 0 && featuresNumber < 100){
-			Random random = new Random();
 			//Select a random feature
-			Position start = this.getFeaturePositions().get(random.nextInt(featuresNumber));
+			Position start = this.getFeaturePositions().get(Environment.r.nextInt(featuresNumber));
 			//Select a random empty cell
-			Position destination = this.getEmptyPositions().get(random.nextInt(this.getEmptyPositions().size()));
+			Position destination = this.getEmptyPositions().get(Environment.r.nextInt(this.getEmptyPositions().size()));
 			
 			featuresThroughMutation[start.getX()][start.getY()] = false;
 			featuresThroughMutation[destination.getX()][destination.getY()] = true;
@@ -154,6 +151,24 @@ public class App {//the app agent
 	 */
 	public void setFeatures(boolean[][] features) {
 		this.features = features;
+		unwanted = new ArrayList<Position>();
+		for(int i = 0; i < 5 ; i++){
+			for(int j = 5; j < 10 ; j++){
+				if(this.features[i][j]) unwanted.add(new Position(i, j));
+			}
+		}
+		featurePositions = new ArrayList<Position>();
+		for(int i = 0; i < 10 ; i++){
+			for(int j = 0; j < 10 ; j++){
+				if(this.features[i][j]) featurePositions.add(new Position(i, j));
+			}
+		}
+		emptyPositions = new ArrayList<Position>();
+		for(int i = 0; i < 10 ; i++){
+			for(int j = 0; j < 10 ; j++){
+				if(!this.features[i][j]) emptyPositions.add(new Position(i, j));
+			}
+		}
 	}
 
 	/**

@@ -3,11 +3,11 @@ package ecosystem.agent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import util.Strategy;
 import util.comparator.AppCreationDateComparator;
 import util.comparator.AppDownloadComparator;
+import ecosystem.environment.Environment;
 import ecosystem.environment.Store;
 
 public class Developer{//the developer agent
@@ -22,8 +22,9 @@ public class Developer{//the developer agent
 	public final static int DEVmin = 1;//time min a developer can build an app
 	public final static int DEVmax = 180;//time max a developer can build an app
 	
-	public final static float Pinactive = 0.0027f;
-	public final static float POnNewChart = 0.001f;
+	
+	public final static int Pinactive = 27; // sur 10.000
+	public final static int POnNewChart = 10; // sur 10.000
 	
 	public Developer(Strategy strategy) {
 		this.uploadedApp = new ArrayList<App>();
@@ -34,8 +35,7 @@ public class Developer{//the developer agent
 	}
 	
 	private void initDevDuration(){
-		Random r = new Random();
-		this.devDuration = Developer.DEVmin + r.nextInt(Developer.DEVmax - Developer.DEVmin + 1);
+		this.devDuration = Developer.DEVmin + Environment.r.nextInt(Developer.DEVmax - Developer.DEVmin + 1);
 	}
 	
 	/**
@@ -81,12 +81,11 @@ public class Developer{//the developer agent
 	 * He can now release it on the store.
 	 */
 	private void releaseApp(int day){
-		Strategy strategy = this.strategy;
-		Random r = new Random();
+		List<App> top = Store.getInstance().getTopAppsChart();
 		while(strategy == Strategy.FLEXIBLE){//selects a new strategy
-			if(r.nextFloat() <= 0.99f){
-				App[] top = Store.getInstance().getTopAppsChart();
-				strategy = top[r.nextInt(top.length)].getDeveloper().getStrategy();
+			if(Environment.r.nextInt(100) <= 98){
+				
+				strategy = top.get(Environment.r.nextInt(top.size())).getDeveloper().getStrategy();
 			}
 			else{
 				strategy = Strategy.getRandom();
@@ -107,7 +106,7 @@ public class Developer{//the developer agent
 					appToRelease = this.copy(this.getBestApp(), day);
 					break;
 				case COPYCAT:
-					appToRelease = this.copy(Store.getInstance().getTopAppsChart()[r.nextInt(Store.getInstance().getTopAppsChart().length)], day);
+					appToRelease = this.copy(top.get(Environment.r.nextInt(top.size())), day);
 					break;
 				default://Normally never reached...//TODO to check
 					appToRelease = new App(this, day);
@@ -117,7 +116,7 @@ public class Developer{//the developer agent
 		//updates the store too
 		Store.getInstance().uploadApp(appToRelease);
 		//if he is lucky enough, his app appears on the New Apps Chart
-		if(r.nextFloat() <= Developer.POnNewChart) Store.getInstance().addToNewAppsChart(appToRelease);
+		if(Environment.r.nextInt(10000) <= Developer.POnNewChart) Store.getInstance().addToNewAppsChart(appToRelease);
 	}
 	
 	/**
@@ -131,9 +130,9 @@ public class Developer{//the developer agent
 				this.releaseApp(day);
 				this.daysTaken = 0;
 			}
-			Random r = new Random();
+
 			//becomes inactive
-			if(r.nextFloat() <= Developer.Pinactive) this.stopDevelopment();
+			if(Environment.r.nextInt(10000) <= Developer.Pinactive) this.stopDevelopment();
 		}
 	}
 	
@@ -144,10 +143,9 @@ public class Developer{//the developer agent
 	 * @return a copied app
 	 */
 	private App copy(App app, int creationDay){
-		Random r = new Random();
 		App copy = new App(this, creationDay);
 		boolean[][] features;
-		if(r.nextFloat() <= 0.5f){//goes through a mutation
+		if(Environment.r.nextInt(10) <= 4){//goes through a mutation
 			features = app.getFeaturesWithMutation();
 		}
 		else{//simply copies its features

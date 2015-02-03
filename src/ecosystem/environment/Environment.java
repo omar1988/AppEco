@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import util.RandomGenerator;
 import util.Strategy;
 import util.comparator.DeveloperAverageDownloadComparator;
 import util.comparator.DeveloperDownloadComparator;
@@ -16,17 +17,21 @@ public class Environment {
 	
 	private static Environment globalEnvironment;
 	
+	private static boolean init=false;
+	
+	public static final RandomGenerator r = new RandomGenerator();
+	
 	private List<User> users;
 	private List<Developer> developers;
 	
 	//users
-	public static final int POPminUser = 1500;
-	public static final int POPmaxUser = 40000;
+	public static final int POPminUser = 150;
+	public static final int POPmaxUser = 4000;
 	public static final double D_User = -4f;
 	public static final double S_User = -0.0038f;
 	//developers
-	public static final int POPminDev = 1000;
-	public static final int POPmaxDev = 120000;
+	public static final int POPminDev = 100;
+	public static final int POPmaxDev = 1200;
 	public static final double D_Dev = -4f;
 	public static final double S_Dev = -0.005f;
 	
@@ -38,6 +43,7 @@ public class Environment {
 	
 	public static Environment getInstance(){
 		if(globalEnvironment == null) globalEnvironment = new Environment();
+		init=true;
 		return globalEnvironment;
 	}
 	
@@ -47,11 +53,16 @@ public class Environment {
 	 * @return the number of users to add
 	 */
 	public static int evaluateNewUsersPopulationSize(int day){
-		double numerator = Environment.POPmaxUser - Environment.POPminUser;
-		double exp = Environment.S_User*day - Environment.D_User;
-		double denominator = 1 + (Math.exp(exp));
-		double result = Environment.POPminUser + (numerator/denominator);
-		return (int) result;
+		if(!init || getInstance().users.size()<POPmaxUser){
+			double numerator = Environment.POPmaxUser - Environment.POPminUser;
+			double exp = Environment.S_User*day - Environment.D_User;
+			double denominator = 1 + (Math.exp(exp));
+			double result = Environment.POPminUser + (numerator/denominator);
+			return (int) result;
+		}
+		else{
+			return 0;
+		}
 	}
 	
 	/**
@@ -60,11 +71,16 @@ public class Environment {
 	 * @return the number of developers to add
 	 */
 	public static int evaluateNewDevelopersPopulationSize(int day){
-		double numerator = Environment.POPmaxDev - Environment.POPminDev;
-		double exp = Environment.S_Dev*day - Environment.D_Dev;
-		double denominator = 1 + (Math.exp(exp));
-		double result = Environment.POPminDev + (numerator/denominator);
-		return (int) result;
+		if(!init || getInstance().developers.size()<POPmaxDev){
+			double numerator = Environment.POPmaxDev - Environment.POPminDev;
+			double exp = Environment.S_Dev*day - Environment.D_Dev;
+			double denominator = 1 + (Math.exp(exp));
+			double result = Environment.POPminDev + (numerator/denominator);
+			return (int) result;
+		}
+		else{
+			return 0;
+		}
 	}
 	
 	/**
@@ -183,5 +199,4 @@ public class Environment {
 		}
 		return (float) potentialDownloads / this.users.size();
 	}
-
 }
