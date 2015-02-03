@@ -107,21 +107,21 @@ public class User{//the user agent
 			//browses the Top App Chart
 			for(int i = 0; i < topApp.size(); i++){
 				App app = topApp.get(i);
-				if(this.likesApp(app)){
+				if( !this.downloadedApps.contains(app) && this.likesApp(app)){
 					this.downloadApp(app, day);
 				} 
 			}
 			//browses the New App Chart
 			for(int i = 0; i < newApp.size(); i++){
 				App app = newApp.get(i);
-				if(this.likesApp(app)){
+				if( !this.downloadedApps.contains(app) && this.likesApp(app)){
 					this.downloadApp(app, day);
 				} 
 			}
 			//conducts a Keyword Search
 			for(int i = 0; i < searchApp.size(); i++){
 				App app = searchApp.get(i);
-				if(this.likesApp(app)){
+				if( !this.downloadedApps.contains(app) && this.likesApp(app)){
 					this.downloadApp(app, day);
 				} 
 			}
@@ -134,7 +134,6 @@ public class User{//the user agent
 	 * @param day when he downloads it
 	 */
 	private void downloadApp(App app, int day){
-		//TODO make sure an app can't be downloaded more than once !!!!
 		app.download(this, day);
 		this.downloadedApps.add(app);
 	}

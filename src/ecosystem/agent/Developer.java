@@ -20,10 +20,12 @@ public class Developer{//the developer agent
 	private int daysTaken;
 	
 	
-	public final static boolean cheaperCopy = true;
+	public final static boolean cheaperCopy = false;
+	
 	public final static int DEVmin = 1;//time min a developer can build an app
 	public final static int DEVmax = 180;//time max a developer can build an app
 	
+	private static final int mutation_factor = 50; // sur 100
 	
 	public final static int Pinactive = 27; // sur 10.000
 	public final static int POnNewChart = 10; // sur 10.000
@@ -147,7 +149,7 @@ public class Developer{//the developer agent
 	private App copy(App app, int creationDay){
 		App copy = new App(this, creationDay);
 		boolean[][] features;
-		if(Environment.r.nextInt(10) <= 4){//goes through a mutation
+		if(Environment.r.nextInt(100) <= mutation_factor){//goes through a mutation
 			features = app.getFeaturesWithMutation();
 			copy.setFeatures(features);
 		}
